@@ -1,0 +1,32 @@
+Prompt 1: Provide the algorithm for aggregating byte sizes and time durations.
+Answer:
+1. Initialize totalByteSize = 0 and windowStartTime = timestamp of first input.
+2. For each incoming record:
+   a. Parse ByteSize and TimeDuration from the input.
+   b. Add to totalByteSize.
+   c. If (currentTime - windowStartTime >= maxDuration) OR (totalByteSize >= maxByteSize):
+      - Emit the current aggregated result.
+      - Reset totalByteSize and windowStartTime for the next window.
+3. Continue until all records are processed.
+
+---
+
+Prompt 2: Generate a unit test for the new aggregation directive in Java.
+Answer:
+```java
+@Test
+public void testAggregateSizeTimeDirective() throws Exception {
+    List<Row> rows = Arrays.asList(
+        new Row("data", "100KB"),
+        new Row("data", "200KB"),
+        new Row("data", "300KB")
+    );
+
+    Directive directive = new AggregateSizeTime();
+    directive.initialize(Arrays.asList("data", "10m", "600KB"));
+    List<Row> output = directive.execute(rows);
+
+    // Expect aggregation of all 3 rows into one
+    assertEquals(1, output.size());
+    assertEquals("600KB", output.get(0).getValue("data"));
+}
